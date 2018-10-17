@@ -1,0 +1,26 @@
+{
+    "name": "egs33/laravel-datastore-auth",
+    "authors": [
+        {
+            "name": "egs33",
+            "email": "egs33.bicycle@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "laravel/framework": "^5.0",
+        "google/cloud-datastore": "^1.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "DatastoreAuth\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "DatastoreAuth\\DatastoreAuthServiceProvider"
+            ]
+        }
+    }
+}
