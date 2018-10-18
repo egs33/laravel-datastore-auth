@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: circleci/php:7.2
+    working_directory: ~/repo
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - v1-composer-{{ checksum "composer.lock" }}
+    - run: composer install
+    - save_cache:
+        paths:
+        - ./vendor
+        key: v1-composer-{{ checksum "composer.lock" }}
+    - run: vendor/bin/phpunit
+    - run: |
+        curl -o codecov https://codecov.io/bash
+        chmod +x codecov
+    - run: ./codecov -f build/clover.xml
