@@ -112,6 +112,10 @@ class DatastoreUserProvider implements UserProvider
         return $this->hasher->check($credentials['password'], $user->getAuthPassword());
     }
 
+    /**
+     * @param array $data
+     * @return User
+     */
     public function create(array $data): User
     {
         if (!\array_key_exists('password', $data)) {
