@@ -21,11 +21,12 @@ class UniqueDatastoreUser implements Rule
     /**
      * UniqueDatastoreUser constructor.
      * @param DatastoreClient $datastoreClient
+     * @param null|string $kind
      */
-    public function __construct(?DatastoreClient $datastoreClient = null)
+    public function __construct(?DatastoreClient $datastoreClient = null, ?string $kind = null)
     {
         $this->datastoreClient = $datastoreClient ?? resolve(DatastoreClient::class);
-        $this->kind = config('datastore_auth.kind') ?? 'users';
+        $this->kind = $kind ?? config('datastore_auth.kind') ?? 'users';
     }
 
 
@@ -36,7 +37,7 @@ class UniqueDatastoreUser implements Rule
      * @param  mixed $value
      * @return bool
      */
-    public function passes($attribute, $value)
+    public function passes($attribute, $value): bool
     {
         $query = $this->datastoreClient->query()->kind($this->kind)
             ->filter($attribute, '=', $value)->keysOnly()->limit(1);
@@ -50,7 +51,7 @@ class UniqueDatastoreUser implements Rule
      *
      * @return string
      */
-    public function message()
+    public function message(): string
     {
         return trans('validation.unique');
     }
