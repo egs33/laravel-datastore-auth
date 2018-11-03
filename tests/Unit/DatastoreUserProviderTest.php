@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Unit;
+
 use DatastoreAuth\DatastoreUserProvider;
 use DatastoreAuth\User;
 use Google\Cloud\Datastore\DatastoreClient;
@@ -7,6 +9,7 @@ use Google\Cloud\Datastore\EntityIterator;
 use Google\Cloud\Datastore\Key;
 use Google\Cloud\Datastore\Query\Query;
 use Illuminate\Contracts\Hashing\Hasher;
+use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
