@@ -3,10 +3,16 @@
 namespace DatastoreAuth;
 
 use Google\Cloud\Datastore\Entity;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Notifications\RoutesNotifications;
 
-class User extends Entity implements Authenticatable
+class User extends Entity implements Authenticatable, CanResetPasswordContract, AuthorizableContract
 {
+    use Authorizable, CanResetPassword, RoutesNotifications;
 
     /**
      * @var string
@@ -75,6 +81,9 @@ class User extends Entity implements Authenticatable
      */
     public function __get($name)
     {
+        if ($name === '__key__') {
+            return $this->getAuthIdentifier();
+        }
         return $this[$name];
     }
 
