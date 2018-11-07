@@ -68,4 +68,22 @@ class User extends Entity implements Authenticatable
     {
         return $this->rememberTokenName;
     }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        return $this[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function __set($name, $value)
+    {
+        $this[$name] = $value;
+    }
 }
