@@ -12,9 +12,7 @@ class DatastoreAuthServiceProvider extends AuthServiceProvider
     {
         $this->registerPolicies();
         Auth::provider('datastore', function ($app, array $config) {
-            $kind = config('datastore_auth.kind') ?? 'users';
-
-            return new DatastoreUserProvider($app->make(DatastoreClient::class), $app->make('hash'), $kind);
+            return $app->make(DatastoreUserProvider::class);
         });
         $this->publishes([
             __DIR__ . '/../config/datastore_auth.php' => config_path('datastore_auth.php'),
@@ -27,6 +25,11 @@ class DatastoreAuthServiceProvider extends AuthServiceProvider
 
         $this->app->singleton(DatastoreClient::class, function ($app) {
             return new DatastoreClient(config('datastore_auth.client_config') ?? []);
+        });
+        $this->app->bind(DatastoreUserProvider::class, function ($app) {
+            $kind = config('datastore_auth.kind') ?? 'users';
+
+            return new DatastoreUserProvider($app->make(DatastoreClient::class), $app->make('hash'), $kind);
         });
     }
 }
