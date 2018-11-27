@@ -8,13 +8,16 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="Test Suite">
+        <testsuite name="unit tests">
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist>
             <directory>./src</directory>
+            <exclude>
+                <file>./src/DatastoreAuthServiceProvider.php</file>
+            </exclude>
         </whitelist>
     </filter>
     <logging>
