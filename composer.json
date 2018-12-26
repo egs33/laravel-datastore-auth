@@ -10,7 +10,7 @@
     "require": {
         "php": "^7.1",
         "laravel/framework": "^5.5.0",
-        "google/cloud-datastore": "^1.0"
+        "google/cloud-datastore": "^1.5"
     },
     "autoload": {
         "psr-4": {
