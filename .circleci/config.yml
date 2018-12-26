@@ -1,6 +1,6 @@
-version: 2
+version: 2.1
 jobs:
-  build:
+  main-test:
     docker:
     - image: circleci/php:7.2
     working_directory: ~/repo
@@ -8,14 +8,46 @@ jobs:
     - checkout
     - restore_cache:
         keys:
-        - v1-composer-{{ checksum "composer.lock" }}
+          - v1-composer-{{ checksum "composer.lock" }}
     - run: composer install
     - save_cache:
         paths:
-        - ./vendor
+          - ./vendor
         key: v1-composer-{{ checksum "composer.lock" }}
     - run: vendor/bin/phpunit
     - run: |
         curl -o codecov https://codecov.io/bash
         chmod +x codecov
     - run: ./codecov -f build/clover.xml
+  test:
+    parameters:
+      php-version:
+        type: string
+      composer_arguments:
+        type: string
+        default: ""
+    docker:
+    - image: circleci/php:<< parameters.php-version >>
+    working_directory: ~/repo
+    steps:
+    - checkout
+    - run: composer update << parameters.composer_arguments >>
+    - run: vendor/bin/phpunit
+workflows:
+  build:
+    jobs:
+      - "main-test"
+      - test:
+          name: "test-php7.1"
+          php-version: "7.1"
+      - test:
+          name: "test-php7.2"
+          php-version: "7.2"
+      - test:
+          name: "test-php7.1-prefer_lowest"
+          php-version: "7.1"
+          composer_arguments: "--prefer-lowest"
+      - test:
+          name: "test-php7.2-prefer_lowest"
+          php-version: "7.2"
+          composer_arguments: "--prefer-lowest"
