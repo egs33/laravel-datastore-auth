@@ -13,7 +13,7 @@
 
 ## Installation
 
-    $ composer install egs33/laravel-datastore-auth
+    $ composer require egs33/laravel-datastore-auth
     $ php artisan vendor:publish --provider="DatastoreAuth\DatastoreAuthServiceProvider"
 
 ## Quick Start
