@@ -226,4 +226,25 @@ class DatastoreUserProviderTest extends TestCase
             $this->assertTrue(true);
         }
     }
+
+    public function testChangePassword()
+    {
+        $hasher = $this->createHasherMock();
+        $hasher->shouldReceive('make')->once()->with('new-password')->andReturn('new-hashed-password');
+        $client = $this->createDatastoreClientMock();
+        $client->shouldReceive('update')->once()->andReturn('');
+
+        $provider = new DatastoreUserProvider($client, $hasher, 'users');
+        $user = new User();
+        $user->set([
+            'password' => 'plain',
+            'name' => 'test user',
+            'other' => 'other-data'
+        ]);
+        $provider->resetPassword($user, 'new-password');
+
+        $this->assertEquals('new-hashed-password', $user->password);
+        $this->assertEquals('test user', $user->name);
+        $this->assertEquals('other-data', $user->other);
+    }
 }

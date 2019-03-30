@@ -128,4 +128,16 @@ class DatastoreUserProvider implements UserProvider
 
         return $entity;
     }
+
+    /**
+     * @param User $user
+     * @param string $newPassword
+     * @return string
+     */
+    public function resetPassword(User $user, string $newPassword): string
+    {
+        $user['password'] = $this->hasher->make($newPassword);
+
+        return $this->datastoreClient->update($user);
+    }
 }
