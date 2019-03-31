@@ -35,21 +35,17 @@ class UserTest extends \Orchestra\Testbench\TestCase
         $app['config']->set('datastore_auth.kind', self::$kind);
     }
 
-    /**
-     *
-     */
-    public static function tearDownAfterClass()
+    protected function tearDown()
     {
-        parent::tearDownAfterClass();
-
         /** @var DatastoreClient $datastoreClient */
-        $datastoreClient = new DatastoreClient();
+        $datastoreClient = $this->app->make(DatastoreClient::class);
         $query = $datastoreClient->query()->kind(self::$kind)->keysOnly();
         $keys = [];
         foreach ($datastoreClient->runQuery($query) as $result) {
             $keys[] = $result->key();
         }
         $datastoreClient->deleteBatch($keys);
+        parent::tearDown();
     }
 
 
@@ -57,7 +53,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
      * @test
      * @medium
      */
-    public function testCreateUser(): User
+    public function testCreateUser(): void
     {
         /** @var DatastoreUserProvider $userProvider */
         $userProvider = Auth::createUserProvider('users');
@@ -79,38 +75,29 @@ class UserTest extends \Orchestra\Testbench\TestCase
         $this->assertEquals(new \DateTime('2000-01-01T12:00:00Z'), $user['created_at']);
         $this->assertInternalType('string', $user['password']);
         $this->assertTrue($userProvider->validateCredentials($user, ['password' => 'test-password']));
-
-        return $user;
     }
 
     /**
      * @test
      * @medium
-     * @depends testCreateUser
      */
-    public function testFindUser(): User
+    public function testFindUser(): void
     {
         /** @var DatastoreUserProvider $userProvider */
         $userProvider = Auth::createUserProvider('users');
+        $userProvider->create([
+            'password' => 'test-password',
+            'name' => 'test_user',
+            'email' => 'test_user@example.com',
+            'created_at' => new \DateTime('2000-01-01T12:00:00Z'),
+        ]);
+
         $user = $userProvider->retrieveByCredentials(['name' => 'test_user']);
 
         $this->assertEquals('test_user', $user['name']);
         $this->assertEquals('test_user@example.com', $user['email']);
+        $this->assertEquals(new \DateTime('2000-01-01T12:00:00Z'), $user['created_at']);
         $this->assertInternalType('string', $user['password']);
-
-        return $user;
-    }
-
-    /**
-     * @test
-     * @medium
-     * @depends testFindUser
-     * @param User $user
-     */
-    public function testValidatePassword(User $user): void
-    {
-        /** @var DatastoreUserProvider $userProvider */
-        $userProvider = Auth::createUserProvider('users');
         $this->assertTrue($userProvider->validateCredentials($user, ['password' => 'test-password']));
     }
 
