@@ -5,7 +5,6 @@ namespace Tests\Medium;
 
 use DatastoreAuth\DatastoreAuthServiceProvider;
 use DatastoreAuth\DatastoreUserProvider;
-use DatastoreAuth\User;
 use Google\Cloud\Datastore\DatastoreClient;
 use Illuminate\Support\Facades\Auth;
 
