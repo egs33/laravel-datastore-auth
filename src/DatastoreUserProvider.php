@@ -72,7 +72,7 @@ class DatastoreUserProvider implements UserProvider
     public function updateRememberToken(Authenticatable $user, $token): void
     {
         $user->setRememberToken($token);
-        $this->datastoreClient->update($user);
+        $this->datastoreClient->update($user, ['allowOverwrite' => true]);
     }
 
     /**
@@ -138,7 +138,7 @@ class DatastoreUserProvider implements UserProvider
     {
         $user['password'] = $this->hasher->make($newPassword);
 
-        return $this->datastoreClient->update($user);
+        return $this->datastoreClient->update($user, ['allowOverwrite' => true]);
     }
 
     /**
@@ -147,6 +147,6 @@ class DatastoreUserProvider implements UserProvider
      */
     public function save(User $user): string
     {
-        return $this->datastoreClient->update($user);
+        return $this->datastoreClient->update($user, ['allowOverwrite' => true]);
     }
 }
