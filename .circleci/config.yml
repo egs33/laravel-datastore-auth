@@ -19,7 +19,7 @@ jobs:
     - run: |
         sudo apt update
         sudo apt install -y wait-for-it
-        wait-for-it localhost:8081
+        wait-for-it localhost:8081 -t 180
     - run: vendor/bin/phpunit
     - run: |
         curl -o codecov https://codecov.io/bash
@@ -43,7 +43,7 @@ jobs:
     - run: |
         sudo apt update
         sudo apt install -y wait-for-it
-        wait-for-it localhost:8081
+        wait-for-it localhost:8081 -t 180
     - run: vendor/bin/phpunit
 workflows:
   build:
