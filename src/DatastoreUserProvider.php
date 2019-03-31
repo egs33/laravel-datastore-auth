@@ -140,4 +140,13 @@ class DatastoreUserProvider implements UserProvider
 
         return $this->datastoreClient->update($user);
     }
+
+    /**
+     * @param User $user
+     * @return string
+     */
+    public function save(User $user): string
+    {
+        return $this->datastoreClient->update($user);
+    }
 }

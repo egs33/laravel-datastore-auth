@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool validateCredentials(Authenticatable $user, array $credentials)
  * @method static User create(array $data)
  * @method static string resetPassword(User $user, string $newPassword)
+ * @method static string save(User $user)
  *
  * @see \DatastoreAuth\DatastoreUserProvider
  */

@@ -2,6 +2,7 @@
 
 namespace DatastoreAuth;
 
+use DatastoreAuth\Facades\DatastoreAuth;
 use Google\Cloud\Datastore\Entity;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
@@ -73,6 +74,14 @@ class User extends Entity implements Authenticatable, CanResetPasswordContract, 
     public function getRememberTokenName(): string
     {
         return $this->rememberTokenName;
+    }
+
+    /**
+     * @return string
+     */
+    public function save(): string
+    {
+        return DatastoreAuth::save($this);
     }
 
     /**
