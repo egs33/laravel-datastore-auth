@@ -13,6 +13,11 @@ use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class DatastoreUserProviderTest
+ * @package Tests\Small
+ * @small
+ */
 class DatastoreUserProviderTest extends TestCase
 {
     public function tearDown()

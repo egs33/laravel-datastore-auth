@@ -8,6 +8,11 @@ use Google\Cloud\Datastore\Key;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class UserTest
+ * @package Tests\Small
+ * @small
+ */
 class UserTest extends TestCase
 {
     public function tearDown()

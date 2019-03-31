@@ -11,6 +11,11 @@ use Illuminate\Translation\Translator;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class UniqueDatastoreUserTest
+ * @package Tests\Small\Rules
+ * @small
+ */
 class UniqueDatastoreUserTest extends TestCase
 {
 
