@@ -3,8 +3,8 @@ jobs:
   main-test:
     docker:
     - image: circleci/php:7.2
-    - image: google/cloud-sdk:240.0.0-alpine
-      command: [gcloud, beta, emulators, datastore, start, '--project=laravel-datastore-auth-test', '--host-port', '0.0.0.0:8081']
+    - image: google/cloud-sdk:240.0.0
+      command: [gcloud, beta, emulators, datastore, start, '--project=laravel-datastore-auth-test', '--host-port', '0.0.0.0:8081', '-q']
     working_directory: ~/repo
     steps:
     - checkout
@@ -34,8 +34,8 @@ jobs:
         default: ""
     docker:
     - image: circleci/php:<< parameters.php-version >>
-    - image: google/cloud-sdk:240.0.0-alpine
-      command: [gcloud, beta, emulators, datastore, start, '--project=laravel-datastore-auth-test', '--host-port', '0.0.0.0:8081']
+    - image: google/cloud-sdk:240.0.0
+      command: [gcloud, beta, emulators, datastore, start, '--project=laravel-datastore-auth-test', '--host-port', '0.0.0.0:8081', '-q']
     working_directory: ~/repo
     steps:
     - checkout
