@@ -3,14 +3,13 @@
 namespace DatastoreAuth;
 
 use Google\Cloud\Datastore\DatastoreClient;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\ServiceProvider;
 
-class DatastoreAuthServiceProvider extends AuthServiceProvider
+class DatastoreAuthServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        $this->registerPolicies();
         Auth::provider('datastore', function ($app, array $config) {
             return $app->make(DatastoreUserProvider::class);
         });
@@ -21,8 +20,6 @@ class DatastoreAuthServiceProvider extends AuthServiceProvider
 
     public function register()
     {
-        parent::register();
-
         $this->app->singleton(DatastoreClient::class, function ($app) {
             return new DatastoreClient(config('datastore_auth.client_config') ?? []);
         });
