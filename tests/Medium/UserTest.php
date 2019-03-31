@@ -35,7 +35,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
         $app['config']->set('datastore_auth.kind', self::$kind);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         /** @var DatastoreClient $datastoreClient */
         $datastoreClient = $this->app->make(DatastoreClient::class);
