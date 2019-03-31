@@ -11,6 +11,9 @@
         <testsuite name="small tests">
             <directory>./tests/Small</directory>
         </testsuite>
+        <testsuite name="medium tests">
+            <directory>./tests/Medium</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist>
