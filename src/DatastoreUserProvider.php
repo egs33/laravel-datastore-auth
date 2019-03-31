@@ -122,7 +122,7 @@ class DatastoreUserProvider implements UserProvider
             throw new \RuntimeException('key "password" is required');
         }
         $data['password'] = $this->hasher->make($data['password']);
-        $key = $this->datastoreClient->key($this->kind);
+        $key = $this->datastoreClient->allocateId($this->datastoreClient->key($this->kind));
         $entity = $this->datastoreClient->entity($key, $data, ['className' => User::class]);
         $this->datastoreClient->insert($entity);
 
