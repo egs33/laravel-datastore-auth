@@ -27,5 +27,7 @@
         <log type="coverage-clover" target="build/clover.xml"/>
     </logging>
     <php>
+        <env name="DATASTORE_EMULATOR_HOST" value="localhost:8081" />
+        <env name="DATASTORE_PROJECT_ID" value="laravel-datastore-auth-test" />
     </php>
 </phpunit>
