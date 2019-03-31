@@ -28,6 +28,6 @@
     </logging>
     <php>
         <env name="DATASTORE_EMULATOR_HOST" value="localhost:8081" />
-        <env name="DATASTORE_PROJECT_ID" value="laravel-datastore-auth-test" />
+        <env name="GOOGLE_CLOUD_PROJECT" value="laravel-datastore-auth-test" />
     </php>
 </phpunit>
