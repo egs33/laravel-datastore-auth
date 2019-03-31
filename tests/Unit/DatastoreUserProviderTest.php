@@ -247,4 +247,17 @@ class DatastoreUserProviderTest extends TestCase
         $this->assertEquals('test user', $user->name);
         $this->assertEquals('other-data', $user->other);
     }
+
+    public function testSave()
+    {
+        $user = new User(null, [
+            'password' => 'pass',
+            'name' => 'test user',
+        ]);
+        $client = $this->createDatastoreClientMock();
+        $client->shouldReceive('update')->once()->andReturn('2');
+
+        $provider = new DatastoreUserProvider($client, $this->createHasherMock(), 'users');
+        $this->assertEquals('2', $provider->save($user));
+    }
 }

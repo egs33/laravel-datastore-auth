@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use DatastoreAuth\Facades\DatastoreAuth;
 use DatastoreAuth\User;
 use Google\Cloud\Datastore\Key;
 use Mockery;
@@ -50,5 +51,16 @@ class UserTest extends TestCase
         $user = new User($key, ['key1' => 'value1']);
         $this->assertEquals('entity-key', $user->__key__);
         $this->assertEquals('value1', $user->key1);
+    }
+
+    public function testSave()
+    {
+        $user = new User(null, [
+            'password' => 'pass',
+            'name' => 'test user',
+        ]);
+        DatastoreAuth::shouldReceive('save')->once()->andReturn('2');
+
+        $this->assertEquals('2', $user->save());
     }
 }
