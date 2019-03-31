@@ -204,6 +204,7 @@ class DatastoreUserProviderTest extends TestCase
                 'password' => 'hash',
                 'name' => 'test user',
             ], ['className' => User::class])->andReturn($this->createTestUser());
+        $client->shouldReceive('allocateId')->once()->andReturn($this->createTestKey());
 
         $provider = new DatastoreUserProvider($client, $hasher, 'users');
         $user = $provider->create([
