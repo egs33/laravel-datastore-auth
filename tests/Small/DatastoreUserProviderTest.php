@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Small;
 
 use DatastoreAuth\DatastoreUserProvider;
 use DatastoreAuth\User;

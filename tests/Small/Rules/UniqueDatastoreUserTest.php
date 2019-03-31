@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Rules;
+namespace Tests\Small\Rules;
 
 use DatastoreAuth\Rules\UniqueDatastoreUser;
 use Google\Cloud\Datastore\DatastoreClient;

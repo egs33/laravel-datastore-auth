@@ -8,8 +8,8 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="unit tests">
-            <directory>./tests/</directory>
+        <testsuite name="small tests">
+            <directory>./tests/Small</directory>
         </testsuite>
     </testsuites>
     <filter>
