@@ -5,6 +5,7 @@ namespace Tests\Medium;
 
 use DatastoreAuth\DatastoreAuthServiceProvider;
 use DatastoreAuth\DatastoreUserProvider;
+use DatastoreAuth\User;
 use Google\Cloud\Datastore\DatastoreClient;
 use Illuminate\Support\Facades\Auth;
 
@@ -155,5 +156,118 @@ class UserTest extends \Orchestra\Testbench\TestCase
         $this->assertEquals(new \DateTime('2000-01-01T12:00:00Z'), $user['created_at']);
         $this->assertEquals(new \DateTime('2001-01-01T12:00:00Z'), $user['updated_at']);
         $this->assertEquals('new_value', $user['new_field']);
+    }
+
+    /**
+     * @test
+     * @medium
+     */
+    public function testAttempt(): void
+    {
+        /** @var DatastoreUserProvider $userProvider */
+        $userProvider = Auth::createUserProvider('users');
+        $userProvider->create([
+            'password' => 'test-facade-password',
+            'name' => 'test_facade_user',
+            'email' => 'test_facade_user@example.com',
+            'created_at' => new \DateTime('2000-01-01T12:00:00Z'),
+        ]);
+
+        $this->assertTrue(Auth::attempt([
+            'password' => 'test-facade-password',
+            'name' => 'test_facade_user',
+        ]));
+
+        $this->assertTrue(Auth::check());
+        $user = Auth::user();
+        $this->assertNotNull($user);
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertEquals('test_facade_user', $user['name']);
+        $this->assertEquals('test_facade_user@example.com', $user['email']);
+        $this->assertEquals(new \DateTime('2000-01-01T12:00:00Z'), $user['created_at']);
+    }
+
+    /**
+     * @test
+     * @medium
+     */
+    public function testAttemptWithInvalidCredential(): void
+    {
+        /** @var DatastoreUserProvider $userProvider */
+        $userProvider = Auth::createUserProvider('users');
+        $userProvider->create([
+            'password' => 'test-facade-password',
+            'name' => 'test_facade_user',
+            'email' => 'test_facade_user@example.com',
+            'created_at' => new \DateTime('2000-01-01T12:00:00Z'),
+        ]);
+
+        $this->assertFalse(Auth::attempt([
+            'password' => 'invalid-password',
+            'name' => 'test_facade_user',
+        ]));
+
+        $this->assertFalse(Auth::check());
+        $user = Auth::user();
+        $this->assertNull($user);
+
+        $this->assertFalse(Auth::attempt([
+            'password' => 'test-facade-password',
+            'name' => 'fake_user',
+        ]));
+
+        $this->assertFalse(Auth::check());
+        $user = Auth::user();
+        $this->assertNull($user);
+    }
+
+    /**
+     * @test
+     * @medium
+     */
+    public function testLogin(): void
+    {
+        /** @var DatastoreUserProvider $userProvider */
+        $userProvider = Auth::createUserProvider('users');
+        $createdUser = $userProvider->create([
+            'password' => 'test-facade-password',
+            'name' => 'test_facade_user',
+            'email' => 'test_facade_user@example.com',
+            'created_at' => new \DateTime('2000-01-01T12:00:00Z'),
+        ]);
+
+        Auth::login($createdUser);
+        $this->assertTrue(Auth::check());
+        $user = Auth::user();
+        $this->assertNotNull($user);
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertEquals('test_facade_user', $user['name']);
+        $this->assertEquals('test_facade_user@example.com', $user['email']);
+        $this->assertEquals(new \DateTime('2000-01-01T12:00:00Z'), $user['created_at']);
+    }
+
+    /**
+     * @test
+     * @medium
+     */
+    public function testLoginUsingId(): void
+    {
+        /** @var DatastoreUserProvider $userProvider */
+        $userProvider = Auth::createUserProvider('users');
+        $createdUser = $userProvider->create([
+            'password' => 'test-facade-password',
+            'name' => 'test_facade_user',
+            'email' => 'test_facade_user@example.com',
+            'created_at' => new \DateTime('2000-01-01T12:00:00Z'),
+        ]);
+
+        Auth::loginUsingId($createdUser->getAuthIdentifier());
+        $this->assertTrue(Auth::check());
+        $user = Auth::user();
+        $this->assertNotNull($user);
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertEquals('test_facade_user', $user['name']);
+        $this->assertEquals('test_facade_user@example.com', $user['email']);
+        $this->assertEquals(new \DateTime('2000-01-01T12:00:00Z'), $user['created_at']);
     }
 }
