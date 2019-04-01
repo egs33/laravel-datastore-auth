@@ -9,6 +9,11 @@ use DatastoreAuth\User;
 use Google\Cloud\Datastore\DatastoreClient;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Class UserTest
+ * @package Tests\Medium
+ * @medium
+ */
 class UserTest extends \Orchestra\Testbench\TestCase
 {
     /**
@@ -51,7 +56,6 @@ class UserTest extends \Orchestra\Testbench\TestCase
 
     /**
      * @test
-     * @medium
      */
     public function testCreateUser(): void
     {
@@ -79,7 +83,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
 
     /**
      * @test
-     * @medium
+     * @depends testCreateUser
      */
     public function testFindUser(): void
     {
@@ -103,7 +107,6 @@ class UserTest extends \Orchestra\Testbench\TestCase
 
     /**
      * @test
-     * @medium
      * @depends testCreateUser
      */
     public function testResetPassword(): void
@@ -127,7 +130,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
 
     /**
      * @test
-     * @medium
+     * @depends testCreateUser
      */
     public function testChangeAttributes(): void
     {
@@ -160,7 +163,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
 
     /**
      * @test
-     * @medium
+     * @depends testCreateUser
      */
     public function testAttempt(): void
     {
@@ -189,7 +192,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
 
     /**
      * @test
-     * @medium
+     * @depends testCreateUser
      */
     public function testAttemptWithInvalidCredential(): void
     {
@@ -223,7 +226,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
 
     /**
      * @test
-     * @medium
+     * @depends testCreateUser
      */
     public function testLogin(): void
     {
@@ -248,7 +251,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
 
     /**
      * @test
-     * @medium
+     * @depends testCreateUser
      */
     public function testLoginUsingId(): void
     {
