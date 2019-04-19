@@ -41,6 +41,8 @@ $userConfig = [
 ];
 $userProvider = Auth::createUserProvider('users');
 $userProvider->create($userConfig);
+// or
+DatastoreAuth::create($userConfig);
 ```
 
 ### Get Current User etc.
@@ -49,6 +51,13 @@ Same as [Laravel authentication](https://laravel.com/docs/5.7/authentication)
 ```php
 $user = Auth::user(); // get current user
 $isLoggedIn = Auth::check();
+```
+
+### Update User Data
+```php
+$user['name'] = 'new-name';
+$user['group'] = 'new-group';
+$user->save();
 ```
 
 ## Config
