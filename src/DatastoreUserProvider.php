@@ -40,6 +40,14 @@ class DatastoreUserProvider implements UserProvider
     }
 
     /**
+     * @return string
+     */
+    public function getKind(): string
+    {
+        return $this->kind;
+    }
+
+    /**
      * @param  mixed $identifier
      * @return User|null
      */

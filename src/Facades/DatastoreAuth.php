@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @package DatastoreAuth\Facades
  *
+ * @method static string getKind()
  * @method static User|null retrieveById(mixed $identifier)
  * @method static User|null retrieveByToken(mixed $identifier, string $token)
  * @method static void updateRememberToken(Authenticatable $user, string $token)
