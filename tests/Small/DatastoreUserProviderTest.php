@@ -65,6 +65,12 @@ class DatastoreUserProviderTest extends TestCase
         return Mockery::mock(Hasher::class);
     }
 
+    public function testGetKind()
+    {
+        $provider = new DatastoreUserProvider($this->createDatastoreClientMock(), $this->createHasherMock(), 'users_kind');
+        $this->assertEquals('users_kind', $provider->getKind());
+    }
+
     public function testRetrieveByIDReturnsUserWhenUserIsFound()
     {
         $client = $this->createDatastoreClientMock();
