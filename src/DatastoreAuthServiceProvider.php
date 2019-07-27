@@ -25,8 +25,10 @@ class DatastoreAuthServiceProvider extends ServiceProvider
         });
         $this->app->bind(DatastoreUserProvider::class, function ($app) {
             $kind = config('datastore_auth.kind') ?? 'users';
+            $cacheConfig = config('datastore_auth.cache') ?? [];
 
-            return new DatastoreUserProvider($app->make(DatastoreClient::class), $app->make('hash'), $kind);
+            return new DatastoreUserProvider($app->make(DatastoreClient::class),
+                $app->make('hash'), $kind, $cacheConfig);
         });
     }
 }
