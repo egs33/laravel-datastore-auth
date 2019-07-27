@@ -6,6 +6,7 @@ use Google\Cloud\Datastore\DatastoreClient;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class DatastoreUserProvider implements UserProvider
@@ -27,16 +28,34 @@ class DatastoreUserProvider implements UserProvider
     private $kind;
 
     /**
+     * @var array
+     */
+    private $cacheConfig;
+
+    /**
      * User constructor.
      * @param DatastoreClient $datastoreClient
      * @param Hasher $hasher
      * @param string $kind
+     * @param array $cacheConfig [optional] {
+     *     @type bool $isEnabled
+     *     @type string $keyPrefix
+     *     @type int|null $ttl
+     * }
      */
-    public function __construct(DatastoreClient $datastoreClient, Hasher $hasher, string $kind)
+    public function __construct(DatastoreClient $datastoreClient,
+                                Hasher $hasher,
+                                string $kind,
+                                array $cacheConfig = [])
     {
         $this->datastoreClient = $datastoreClient;
         $this->hasher = $hasher;
         $this->kind = $kind;
+        $this->$cacheConfig = $cacheConfig + [
+                'isEnabled' => false,
+                'keyPrefix' => self::class.'-',
+                'ttl' => null,
+            ];
     }
 
     /**
@@ -48,14 +67,57 @@ class DatastoreUserProvider implements UserProvider
     }
 
     /**
+     * @param string|int $identifier
+     * @return string
+     */
+    private function composeCacheKey($identifier): string
+    {
+        return $this->cacheConfig['keyPrefix'] . $identifier;
+    }
+
+    /**
+     * @param string|int $identifier
+     * @return User|null
+     */
+    private function getUserFromCache($identifier): ?User
+    {
+        if (!$this->cacheConfig['isEnabled']) {
+            return null;
+        }
+        $user = Cache::get($this->composeCacheKey($identifier));
+
+        return $user instanceof User ? $user : null;
+    }
+
+    /**
+     * @param string|int $identifier
+     * @param User $user
+     * @return bool
+     */
+    private function putUserToCache($identifier, User $user): bool
+    {
+        if (!$this->cacheConfig['isEnabled']) {
+            return true;
+        }
+
+        return Cache::put($this->composeCacheKey($identifier), $user, $this->cacheConfig['ttl']);
+    }
+
+    /**
      * @param  mixed $identifier
      * @return User|null
      */
     public function retrieveById($identifier): ?User
     {
+        $cachedUser = $this->getUserFromCache($identifier);
+        if ($cachedUser != null) {
+            return $cachedUser;
+        }
         $key = $this->datastoreClient->key($this->kind, $identifier);
+        $user = $this->datastoreClient->lookup($key, ['className' => User::class]);
+        $this->putUserToCache($identifier, $user);
 
-        return $this->datastoreClient->lookup($key, ['className' => User::class]);
+        return $user;
     }
 
     /**
