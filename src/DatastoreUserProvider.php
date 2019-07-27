@@ -99,8 +99,11 @@ class DatastoreUserProvider implements UserProvider
         if (!$this->cacheConfig['isEnabled']) {
             return true;
         }
+        $ttl = $this->cacheConfig['ttl'] === null
+            ? null
+            : now()->addSeconds($this->cacheConfig['ttl']);
 
-        return Cache::put($this->composeCacheKey($identifier), $user, $this->cacheConfig['ttl']);
+        return !!Cache::put($this->composeCacheKey($identifier), $user, $ttl);
     }
 
     /**
