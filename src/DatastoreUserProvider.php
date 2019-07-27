@@ -51,7 +51,7 @@ class DatastoreUserProvider implements UserProvider
         $this->datastoreClient = $datastoreClient;
         $this->hasher = $hasher;
         $this->kind = $kind;
-        $this->$cacheConfig = $cacheConfig + [
+        $this->cacheConfig = $cacheConfig + [
                 'isEnabled' => false,
                 'keyPrefix' => self::class.'-',
                 'ttl' => null,
@@ -115,7 +115,9 @@ class DatastoreUserProvider implements UserProvider
         }
         $key = $this->datastoreClient->key($this->kind, $identifier);
         $user = $this->datastoreClient->lookup($key, ['className' => User::class]);
-        $this->putUserToCache($identifier, $user);
+        if ($user != null) {
+            $this->putUserToCache($identifier, $user);
+        }
 
         return $user;
     }
