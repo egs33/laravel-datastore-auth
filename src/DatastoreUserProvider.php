@@ -38,9 +38,9 @@ class DatastoreUserProvider implements UserProvider
      * @param Hasher $hasher
      * @param string $kind
      * @param array $cacheConfig [optional] {
-     * @type bool $isEnabled
-     * @type string $keyPrefix
-     * @type int|null $ttl
+     *     @type bool $isEnabled
+     *     @type string $keyPrefix
+     *     @type int|null $ttl
      * }
      */
     public function __construct(DatastoreClient $datastoreClient,
