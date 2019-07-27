@@ -38,9 +38,9 @@ class DatastoreUserProvider implements UserProvider
      * @param Hasher $hasher
      * @param string $kind
      * @param array $cacheConfig [optional] {
-     *     @type bool $isEnabled
-     *     @type string $keyPrefix
-     *     @type int|null $ttl
+     * @type bool $isEnabled
+     * @type string $keyPrefix
+     * @type int|null $ttl
      * }
      */
     public function __construct(DatastoreClient $datastoreClient,
@@ -53,7 +53,7 @@ class DatastoreUserProvider implements UserProvider
         $this->kind = $kind;
         $this->cacheConfig = $cacheConfig + [
                 'isEnabled' => false,
-                'keyPrefix' => self::class.'-',
+                'keyPrefix' => self::class . '-',
                 'ttl' => null,
             ];
     }
@@ -107,7 +107,7 @@ class DatastoreUserProvider implements UserProvider
     }
 
     /**
-     * @param  mixed $identifier
+     * @param mixed $identifier
      * @return User|null
      */
     public function retrieveById($identifier): ?User
@@ -128,8 +128,8 @@ class DatastoreUserProvider implements UserProvider
     /**
      * Retrieve a user by their unique identifier and "remember me" token.
      *
-     * @param  mixed $identifier
-     * @param  string $token
+     * @param mixed $identifier
+     * @param string $token
      * @return Authenticatable|null
      */
     public function retrieveByToken($identifier, $token): ?User
@@ -140,8 +140,8 @@ class DatastoreUserProvider implements UserProvider
     }
 
     /**
-     * @param  Authenticatable $user
-     * @param  string $token
+     * @param Authenticatable $user
+     * @param string $token
      * @return void
      */
     public function updateRememberToken(Authenticatable $user, $token): void
@@ -151,7 +151,7 @@ class DatastoreUserProvider implements UserProvider
     }
 
     /**
-     * @param  array $credentials
+     * @param array $credentials
      * @return Authenticatable|null
      */
     public function retrieveByCredentials(array $credentials): ?User
@@ -178,8 +178,8 @@ class DatastoreUserProvider implements UserProvider
     }
 
     /**
-     * @param  Authenticatable $user
-     * @param  array $credentials
+     * @param Authenticatable $user
+     * @param array $credentials
      * @return bool
      */
     public function validateCredentials(Authenticatable $user, array $credentials): bool
