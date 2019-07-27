@@ -69,9 +69,22 @@ Default is
 [
     'client_config' => [],
     'kind' => 'users',
+    'cache' => [
+        'isEnabled' => false,
+        'keyPrefix' => \DatastoreAuth\DatastoreUserProvider::class,
+        'ttl' => null,
+    ]
 ]
 ```
-`kind` is kind name of user table.
 
 `client_config` is passed to constructor of `Google\Cloud\Datastore\DatastoreClient`.
 Please see [document](https://googleapis.github.io/google-cloud-php/#/docs/cloud-datastore/v1.7.0/datastore/datastoreclient) of `google/cloud-datastore`.
+
+`kind` is kind name of user table.
+
+### Cache
+
+The cache is only used when fetch user by id.
+Cache storage is specified by `config/cache.php` in your laravel project.
+`ttl` is expressed in seconds regardless of the laravel version.
+If it's null, no expire.

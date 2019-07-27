@@ -9,8 +9,8 @@ return [
     | Cache config
     |--------------------------------------------------------------------------
     |
-    | If isEnabled is true, use cache in fetch user data by id
-    | (DatastoreUserProvider#retrieveById and DatastoreUserProvider#retrieveByToken) only.
+    | The cache is only used in fetch user data by id
+    | (DatastoreUserProvider#retrieveById and DatastoreUserProvider#retrieveByToken).
     |
     |  ttl use seconds, null is forever.
     */
