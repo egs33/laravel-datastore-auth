@@ -2,6 +2,7 @@
 
 namespace Tests\Small;
 
+use Carbon\Carbon;
 use DatastoreAuth\DatastoreUserProvider;
 use DatastoreAuth\User;
 use Google\Cloud\Datastore\DatastoreClient;
@@ -9,6 +10,7 @@ use Google\Cloud\Datastore\EntityIterator;
 use Google\Cloud\Datastore\Key;
 use Google\Cloud\Datastore\Query\Query;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
@@ -93,6 +95,75 @@ class DatastoreUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
+    public function testRetrieveByIDFetchFromCache()
+    {
+        $client = $this->createDatastoreClientMock();
+        $client->shouldNotReceive('lookup');
+        Cache::shouldReceive('get')
+            ->once()
+            ->with('test-prefix-user-id:1')
+            ->andReturn($this->createTestUser());
+        $cacheConfig = ['isEnabled' => true, 'keyPrefix' => 'test-prefix-user-id:'];
+
+        $provider = new DatastoreUserProvider($client, $this->createHasherMock(), 'users', $cacheConfig);
+        $user = $provider->retrieveById(1);
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertEquals('test user', $user['name']);
+        $this->assertEquals('test@example.com', $user['email']);
+    }
+
+    public function testRetrieveByIDStoreToCache()
+    {
+        $client = $this->createDatastoreClientMock();
+        $user = $this->createTestUser();
+        $client->shouldReceive('lookup')->once()->andReturn($user);
+        Cache::shouldReceive('get')
+            ->once()
+            ->with('test-prefix-user-id:1')
+            ->andReturn(null);
+        Cache::shouldReceive('put')
+            ->once()
+            ->withArgs(function ($key, $value, $ttl) use ($user) {
+                return $key === 'test-prefix-user-id:1'
+                    && $value === $user
+                    && $ttl instanceof Carbon;
+            })
+            ->andReturn(true);
+        $cacheConfig = ['isEnabled' => true, 'keyPrefix' => 'test-prefix-user-id:', 'ttl' => 10];
+
+        $provider = new DatastoreUserProvider($client, $this->createHasherMock(), 'users', $cacheConfig);
+        $user = $provider->retrieveById(1);
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertEquals('test user', $user['name']);
+        $this->assertEquals('test@example.com', $user['email']);
+    }
+
+    public function testRetrieveByIDStoreToCacheWithNullTTL()
+    {
+        $client = $this->createDatastoreClientMock();
+        $user = $this->createTestUser();
+        $client->shouldReceive('lookup')->once()->andReturn($user);
+        Cache::shouldReceive('get')
+            ->once()
+            ->with('test-prefix-user-id:1')
+            ->andReturn(null);
+        Cache::shouldReceive('put')
+            ->once()
+            ->withArgs(function ($key, $value, $ttl) use ($user) {
+                return $key === 'test-prefix-user-id:1'
+                    && $value === $user
+                    && $ttl === null;
+            })
+            ->andReturn(true);
+        $cacheConfig = ['isEnabled' => true, 'keyPrefix' => 'test-prefix-user-id:'];
+
+        $provider = new DatastoreUserProvider($client, $this->createHasherMock(), 'users', $cacheConfig);
+        $user = $provider->retrieveById(1);
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertEquals('test user', $user['name']);
+        $this->assertEquals('test@example.com', $user['email']);
+    }
+
     public function testRetrieveByTokenReturnsUser()
     {
         $testUser = $this->createTestUser();
@@ -128,6 +199,26 @@ class DatastoreUserProviderTest extends TestCase
         $provider = new DatastoreUserProvider($client, $this->createHasherMock(), 'users');
         $user = $provider->retrieveByToken(1, 'bad-token');
         $this->assertNull($user);
+    }
+
+    public function testRetrieveByTokenFetchFromCache()
+    {
+        $testUser = $this->createTestUser();
+        $testUser->setRememberToken('token');
+        $client = $this->createDatastoreClientMock();
+        $client->shouldNotReceive('lookup');
+        Cache::shouldReceive('get')
+            ->once()
+            ->with('test-prefix-user-id:user-id')
+            ->andReturn($testUser);
+        $cacheConfig = ['isEnabled' => true, 'keyPrefix' => 'test-prefix-user-id:'];
+
+        $provider = new DatastoreUserProvider($client, $this->createHasherMock(), 'users', $cacheConfig);
+        $user = $provider->retrieveByToken('user-id', 'token');
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertEquals('test user', $user['name']);
+        $this->assertEquals('test@example.com', $user['email']);
+        $this->assertEquals('token', $user->getRememberToken());
     }
 
     public function testUpdateRememberToken()

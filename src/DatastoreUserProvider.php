@@ -6,6 +6,7 @@ use Google\Cloud\Datastore\DatastoreClient;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class DatastoreUserProvider implements UserProvider
@@ -27,16 +28,34 @@ class DatastoreUserProvider implements UserProvider
     private $kind;
 
     /**
+     * @var array
+     */
+    private $cacheConfig;
+
+    /**
      * User constructor.
      * @param DatastoreClient $datastoreClient
      * @param Hasher $hasher
      * @param string $kind
+     * @param array $cacheConfig [optional] {
+     *     @type bool $isEnabled
+     *     @type string $keyPrefix
+     *     @type int|null $ttl
+     * }
      */
-    public function __construct(DatastoreClient $datastoreClient, Hasher $hasher, string $kind)
+    public function __construct(DatastoreClient $datastoreClient,
+                                Hasher $hasher,
+                                string $kind,
+                                array $cacheConfig = [])
     {
         $this->datastoreClient = $datastoreClient;
         $this->hasher = $hasher;
         $this->kind = $kind;
+        $this->cacheConfig = $cacheConfig + [
+                'isEnabled' => false,
+                'keyPrefix' => self::class . '-',
+                'ttl' => null,
+            ];
     }
 
     /**
@@ -48,21 +67,69 @@ class DatastoreUserProvider implements UserProvider
     }
 
     /**
-     * @param  mixed $identifier
+     * @param string|int $identifier
+     * @return string
+     */
+    private function composeCacheKey($identifier): string
+    {
+        return $this->cacheConfig['keyPrefix'] . $identifier;
+    }
+
+    /**
+     * @param string|int $identifier
+     * @return User|null
+     */
+    private function getUserFromCache($identifier): ?User
+    {
+        if (!$this->cacheConfig['isEnabled']) {
+            return null;
+        }
+        $user = Cache::get($this->composeCacheKey($identifier));
+
+        return $user instanceof User ? $user : null;
+    }
+
+    /**
+     * @param string|int $identifier
+     * @param User $user
+     * @return bool
+     */
+    private function putUserToCache($identifier, User $user): bool
+    {
+        if (!$this->cacheConfig['isEnabled']) {
+            return true;
+        }
+        $ttl = $this->cacheConfig['ttl'] === null
+            ? null
+            : now()->addSeconds($this->cacheConfig['ttl']);
+
+        return !!Cache::put($this->composeCacheKey($identifier), $user, $ttl);
+    }
+
+    /**
+     * @param mixed $identifier
      * @return User|null
      */
     public function retrieveById($identifier): ?User
     {
+        $cachedUser = $this->getUserFromCache($identifier);
+        if ($cachedUser != null) {
+            return $cachedUser;
+        }
         $key = $this->datastoreClient->key($this->kind, $identifier);
+        $user = $this->datastoreClient->lookup($key, ['className' => User::class]);
+        if ($user != null) {
+            $this->putUserToCache($identifier, $user);
+        }
 
-        return $this->datastoreClient->lookup($key, ['className' => User::class]);
+        return $user;
     }
 
     /**
      * Retrieve a user by their unique identifier and "remember me" token.
      *
-     * @param  mixed $identifier
-     * @param  string $token
+     * @param mixed $identifier
+     * @param string $token
      * @return Authenticatable|null
      */
     public function retrieveByToken($identifier, $token): ?User
@@ -73,8 +140,8 @@ class DatastoreUserProvider implements UserProvider
     }
 
     /**
-     * @param  Authenticatable $user
-     * @param  string $token
+     * @param Authenticatable $user
+     * @param string $token
      * @return void
      */
     public function updateRememberToken(Authenticatable $user, $token): void
@@ -84,7 +151,7 @@ class DatastoreUserProvider implements UserProvider
     }
 
     /**
-     * @param  array $credentials
+     * @param array $credentials
      * @return Authenticatable|null
      */
     public function retrieveByCredentials(array $credentials): ?User
@@ -111,8 +178,8 @@ class DatastoreUserProvider implements UserProvider
     }
 
     /**
-     * @param  Authenticatable $user
-     * @param  array $credentials
+     * @param Authenticatable $user
+     * @param array $credentials
      * @return bool
      */
     public function validateCredentials(Authenticatable $user, array $credentials): bool
