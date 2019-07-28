@@ -7,14 +7,16 @@ use DatastoreAuth\DatastoreAuthServiceProvider;
 use DatastoreAuth\DatastoreUserProvider;
 use DatastoreAuth\User;
 use Google\Cloud\Datastore\DatastoreClient;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
+use Orchestra\Testbench\TestCase;
 
 /**
  * Class UserTest
  * @package Tests\Medium
  * @medium
  */
-class UserTest extends \Orchestra\Testbench\TestCase
+class UserTest extends TestCase
 {
     /**
      * @var string
@@ -22,7 +24,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
     static private $kind;
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      * @return array
      */
     protected function getPackageProviders($app)
@@ -31,7 +33,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -77,7 +79,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
         $this->assertEquals('test_user', $user['name']);
         $this->assertEquals('test_user@example.com', $user['email']);
         $this->assertEquals(new \DateTime('2000-01-01T12:00:00Z'), $user['created_at']);
-        $this->assertInternalType('string', $user['password']);
+        $this->assertIsString($user['password']);
         $this->assertTrue($userProvider->validateCredentials($user, ['password' => 'test-password']));
     }
 
@@ -101,7 +103,7 @@ class UserTest extends \Orchestra\Testbench\TestCase
         $this->assertEquals('test_user', $user['name']);
         $this->assertEquals('test_user@example.com', $user['email']);
         $this->assertEquals(new \DateTime('2000-01-01T12:00:00Z'), $user['created_at']);
-        $this->assertInternalType('string', $user['password']);
+        $this->assertIsString($user['password']);
         $this->assertTrue($userProvider->validateCredentials($user, ['password' => 'test-password']));
     }
 
