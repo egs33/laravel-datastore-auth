@@ -164,7 +164,7 @@ class DatastoreUserProvider implements UserProvider
     public function updateRememberToken(Authenticatable $user, $token): void
     {
         $user->setRememberToken($token);
-        $this->datastoreClient->update($user, ['allowOverwrite' => true]);
+        $this->save($user);
     }
 
     /**

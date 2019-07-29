@@ -266,7 +266,7 @@ class DatastoreUserProviderTest extends TestCase
     {
         $testUser = $this->createTestUser();
         $client = $this->createDatastoreClientMock();
-        $client->shouldReceive('update')->once();
+        $client->shouldReceive('update')->once()->andReturn('3');
 
         $provider = new DatastoreUserProvider($client, $this->createHasherMock(), 'users');
         $provider->updateRememberToken($testUser, 'new-token');

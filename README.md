@@ -89,6 +89,6 @@ Cache storage is specified by `config/cache.php` in your laravel project.
 `ttl` is expressed in seconds regardless of the laravel version.
 If it's null, no expire.
 
-When `DatastoreUserProvider#resetPassword`, `DatastoreUserProvider#save`
+When `DatastoreUserProvider#resetPassword`, `DatastoreUserProvider#save`, `DatastoreUserProvider#updateRememberToken`
 or `User#save` is called, cache is cleared.
 But you can call `DatastoreUserProvider#deleteCache` if necessary.
