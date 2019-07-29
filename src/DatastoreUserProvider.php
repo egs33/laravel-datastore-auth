@@ -229,10 +229,8 @@ class DatastoreUserProvider implements UserProvider
     public function resetPassword(User $user, string $newPassword): string
     {
         $user['password'] = $this->hasher->make($newPassword);
-        $version = $this->datastoreClient->update($user, ['allowOverwrite' => true]);
-        $this->deleteCache($user);
 
-        return $version;
+        return $this->save($user);
     }
 
     /**
