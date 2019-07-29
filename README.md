@@ -88,3 +88,7 @@ The cache is only used when fetch user by id.
 Cache storage is specified by `config/cache.php` in your laravel project.
 `ttl` is expressed in seconds regardless of the laravel version.
 If it's null, no expire.
+
+When `DatastoreUserProvider#resetPassword`, `DatastoreUserProvider#save`
+or `User#save` is called, cache is cleared.
+But you can call `DatastoreUserProvider#deleteCache` if necessary.
