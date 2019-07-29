@@ -73,6 +73,47 @@ class DatastoreUserProviderTest extends TestCase
         $this->assertEquals('users_kind', $provider->getKind());
     }
 
+    public function testDeleteCacheDisabled()
+    {
+        $provider = new DatastoreUserProvider($this->createDatastoreClientMock(), $this->createHasherMock(), 'users_kind');
+        $user = new User($this->createTestKey());
+        Cache::shouldReceive('forget')->never();
+        $this->assertFalse($provider->deleteCache(10));
+        $this->assertFalse($provider->deleteCache('abcd'));
+        $this->assertFalse($provider->deleteCache($user));
+    }
+
+    public function testDeleteCacheInvalidKey()
+    {
+        $cacheConfig = ['isEnabled' => true, 'keyPrefix' => 'test-prefix-user-id:'];
+        $provider = new DatastoreUserProvider($this->createDatastoreClientMock(), $this->createHasherMock(), 'users_kind', $cacheConfig);
+        $user = new User($this->createTestKey());
+        Cache::shouldReceive('forget')->never();
+        $this->assertFalse($provider->deleteCache($user));
+    }
+
+    public function testDeleteCache()
+    {
+        $cacheConfig = ['isEnabled' => true, 'keyPrefix' => 'test-prefix-user-id:'];
+        $provider = new DatastoreUserProvider($this->createDatastoreClientMock(), $this->createHasherMock(), 'users_kind', $cacheConfig);
+        $user1 = new User($this->createTestKey()->pathElement('user', 'key123'));
+        Cache::shouldReceive('forget')
+            ->once()
+            ->with('test-prefix-user-id:10')
+            ->andReturn(true);
+        $this->assertTrue($provider->deleteCache(10));
+        Cache::shouldReceive('forget')
+            ->once()
+            ->with('test-prefix-user-id:abcd')
+            ->andReturn(true);
+        $this->assertTrue($provider->deleteCache('abcd'));
+        Cache::shouldReceive('forget')
+            ->once()
+            ->with('test-prefix-user-id:key123')
+            ->andReturn(true);
+        $this->assertTrue($provider->deleteCache($user1));
+    }
+
     public function testRetrieveByIDReturnsUserWhenUserIsFound()
     {
         $client = $this->createDatastoreClientMock();
@@ -351,6 +392,32 @@ class DatastoreUserProviderTest extends TestCase
         $this->assertEquals('other-data', $user->other);
     }
 
+    public function testChangePasswordAndClearCache()
+    {
+        $hasher = $this->createHasherMock();
+        $hasher->shouldReceive('make')->once()->with('new-password')->andReturn('new-hashed-password');
+        $client = $this->createDatastoreClientMock();
+        $client->shouldReceive('update')->once()->andReturn('');
+        Cache::shouldReceive('forget')
+            ->once()
+            ->with('test-prefix-user-id:abcd')
+            ->andReturn(true);
+        $cacheConfig = ['isEnabled' => true, 'keyPrefix' => 'test-prefix-user-id:'];
+
+        $provider = new DatastoreUserProvider($client, $hasher, 'users', $cacheConfig);
+        $user = new User($this->createTestKey()->pathElement('users', 'abcd'));
+        $user->set([
+            'password' => 'plain',
+            'name' => 'test user',
+            'other' => 'other-data'
+        ]);
+        $provider->resetPassword($user, 'new-password');
+
+        $this->assertEquals('new-hashed-password', $user->password);
+        $this->assertEquals('test user', $user->name);
+        $this->assertEquals('other-data', $user->other);
+    }
+
     public function testSave()
     {
         $user = new User(null, [
@@ -361,6 +428,24 @@ class DatastoreUserProviderTest extends TestCase
         $client->shouldReceive('update')->once()->andReturn('2');
 
         $provider = new DatastoreUserProvider($client, $this->createHasherMock(), 'users');
+        $this->assertEquals('2', $provider->save($user));
+    }
+
+    public function testSaveAndClearCache()
+    {
+        $user = new User($this->createTestKey()->pathElement('users', 1500), [
+            'password' => 'pass',
+            'name' => 'test user',
+        ]);
+        $client = $this->createDatastoreClientMock();
+        $client->shouldReceive('update')->once()->andReturn('2');
+        Cache::shouldReceive('forget')
+            ->once()
+            ->with('test-prefix-user-id:1500')
+            ->andReturn(true);
+        $cacheConfig = ['isEnabled' => true, 'keyPrefix' => 'test-prefix-user-id:'];
+
+        $provider = new DatastoreUserProvider($client, $this->createHasherMock(), 'users', $cacheConfig);
         $this->assertEquals('2', $provider->save($user));
     }
 }

@@ -79,7 +79,7 @@ class DatastoreUserProvider implements UserProvider
      * @param string|int $identifier
      * @return User|null
      */
-    private function getUserFromCache($identifier): ?User
+    private function getCache($identifier): ?User
     {
         if (!$this->cacheConfig['isEnabled']) {
             return null;
@@ -94,10 +94,10 @@ class DatastoreUserProvider implements UserProvider
      * @param User $user
      * @return bool
      */
-    private function putUserToCache($identifier, User $user): bool
+    private function putCache($identifier, User $user): bool
     {
         if (!$this->cacheConfig['isEnabled']) {
-            return true;
+            return false;
         }
         $ttl = $this->cacheConfig['ttl'] === null
             ? null
@@ -107,19 +107,36 @@ class DatastoreUserProvider implements UserProvider
     }
 
     /**
+     * @param User|int|string $user
+     * @return bool
+     */
+    public function deleteCache($user): bool
+    {
+        if (!$this->cacheConfig['isEnabled']) {
+            return false;
+        }
+        $identifier = $user instanceof User ? $user->getAuthIdentifier() : $user;
+        if (is_null($identifier)) {
+            return false;
+        }
+
+        return !!Cache::forget($this->composeCacheKey($identifier));
+    }
+
+    /**
      * @param mixed $identifier
      * @return User|null
      */
     public function retrieveById($identifier): ?User
     {
-        $cachedUser = $this->getUserFromCache($identifier);
+        $cachedUser = $this->getCache($identifier);
         if ($cachedUser != null) {
             return $cachedUser;
         }
         $key = $this->datastoreClient->key($this->kind, $identifier);
         $user = $this->datastoreClient->lookup($key, ['className' => User::class]);
         if ($user != null) {
-            $this->putUserToCache($identifier, $user);
+            $this->putCache($identifier, $user);
         }
 
         return $user;
@@ -212,8 +229,10 @@ class DatastoreUserProvider implements UserProvider
     public function resetPassword(User $user, string $newPassword): string
     {
         $user['password'] = $this->hasher->make($newPassword);
+        $version = $this->datastoreClient->update($user, ['allowOverwrite' => true]);
+        $this->deleteCache($user);
 
-        return $this->datastoreClient->update($user, ['allowOverwrite' => true]);
+        return $version;
     }
 
     /**
@@ -222,6 +241,9 @@ class DatastoreUserProvider implements UserProvider
      */
     public function save(User $user): string
     {
-        return $this->datastoreClient->update($user, ['allowOverwrite' => true]);
+        $version = $this->datastoreClient->update($user, ['allowOverwrite' => true]);
+        $this->deleteCache($user);
+
+        return $version;
     }
 }
