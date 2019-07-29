@@ -53,7 +53,7 @@ class DatastoreUserProvider implements UserProvider
         $this->kind = $kind;
         $this->cacheConfig = $cacheConfig + [
                 'isEnabled' => false,
-                'keyPrefix' => self::class . '-',
+                'keyPrefix' => self::class . ':',
                 'ttl' => null,
             ];
     }

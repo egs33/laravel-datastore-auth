@@ -71,7 +71,7 @@ Default is
     'kind' => 'users',
     'cache' => [
         'isEnabled' => false,
-        'keyPrefix' => \DatastoreAuth\DatastoreUserProvider::class,
+        'keyPrefix' => \DatastoreAuth\DatastoreUserProvider::class . ':',
         'ttl' => null,
     ]
 ]
