@@ -8,18 +8,7 @@ jobs:
     working_directory: ~/repo
     steps:
     - checkout
-    - restore_cache:
-        keys:
-          - v1-composer-{{ checksum "composer.lock" }}
     - run: composer install
-    - save_cache:
-        paths:
-          - ./vendor
-        key: v1-composer-{{ checksum "composer.lock" }}
-    - run: |
-        sudo apt update
-        sudo apt install -y wait-for-it
-        wait-for-it localhost:8081 -t 180
     - run: vendor/bin/phpunit
     - run: |
         curl -o codecov https://codecov.io/bash
@@ -40,10 +29,6 @@ jobs:
     steps:
     - checkout
     - run: composer update << parameters.composer_arguments >>
-    - run: |
-        sudo apt update
-        sudo apt install -y wait-for-it
-        wait-for-it localhost:8081 -t 180
     - run: vendor/bin/phpunit
 workflows:
   build:
