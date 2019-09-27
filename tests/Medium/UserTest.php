@@ -9,7 +9,9 @@ use DatastoreAuth\User;
 use Google\Cloud\Datastore\DatastoreClient;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Runner\Version;
 
 /**
  * Class UserTest
@@ -55,6 +57,14 @@ class UserTest extends TestCase
         parent::tearDown();
     }
 
+    public static function assertIsString($actual, string $message = ''): void
+    {
+        if (Str::startsWith(Version::id(), '8')) {
+            parent::assertIsString($actual, $message);
+            return;
+        }
+        parent::assertInternalType('string', $actual, $message);
+    }
 
     /**
      * @test

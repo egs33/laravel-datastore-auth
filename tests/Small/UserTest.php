@@ -5,8 +5,10 @@ namespace Tests\Small;
 use DatastoreAuth\Facades\DatastoreAuth;
 use DatastoreAuth\User;
 use Google\Cloud\Datastore\Key;
+use Illuminate\Support\Str;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Runner\Version;
 
 /**
  * Class UserTest
@@ -15,9 +17,18 @@ use PHPUnit\Framework\TestCase;
  */
 class UserTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         Mockery::close();
+    }
+
+    public static function assertIsString($actual, string $message = ''): void
+    {
+        if (Str::startsWith(Version::id(), '8')) {
+            parent::assertIsString($actual, $message);
+            return;
+        }
+        parent::assertInternalType('string', $actual, $message);
     }
 
     public function testGetAuthIdentifier()
@@ -43,7 +54,7 @@ class UserTest extends TestCase
     {
         $key = Mockery::mock(Key::class);
         $user = new User($key);
-        $this->assertInternalType('string', $user->getRememberTokenName());
+        $this->assertIsString($user->getRememberTokenName());
         $this->assertEmpty($user->getRememberToken());
         $user->setRememberToken('test-token');
         $this->assertEquals('test-token', $user->getRememberToken());

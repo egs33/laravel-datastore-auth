@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 class UniqueDatastoreUserTest extends TestCase
 {
 
-    public function tearDown()
+    public function tearDown(): void
     {
         Mockery::close();
     }
@@ -54,13 +54,14 @@ class UniqueDatastoreUserTest extends TestCase
         $this->assertFalse($rule->passes('email', 'test@example.com'));
     }
 
-    public function testMassage()
+    public function testMessage()
     {
         $client = Mockery::mock(DatastoreClient::class);
         $rule = new UniqueDatastoreUser($client, 'users');
 
         $translator = Mockery::mock(Translator::class);
-        $translator->shouldReceive('trans')->andReturn('validation message');
+        $translateMethodName = method_exists($translator, 'trans') ? 'trans' : 'get';
+        $translator->shouldReceive($translateMethodName)->once()->andReturn('validation message');
         Container::getInstance()->bind('translator', function () use ($translator) {
             return $translator;
         });

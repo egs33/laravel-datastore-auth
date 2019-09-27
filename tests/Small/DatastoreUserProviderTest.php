@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class DatastoreUserProviderTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         Mockery::close();
     }
