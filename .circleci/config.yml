@@ -41,10 +41,17 @@ workflows:
           name: "test-php7.2"
           php-version: "7.2"
       - test:
+          name: "test-php7.3"
+          php-version: "7.3"
+      - test:
           name: "test-php7.1-prefer_lowest"
           php-version: "7.1"
           composer_arguments: "--prefer-lowest"
       - test:
           name: "test-php7.2-prefer_lowest"
           php-version: "7.2"
+          composer_arguments: "--prefer-lowest"
+      - test:
+          name: "test-php7.3-prefer_lowest"
+          php-version: "7.3"
           composer_arguments: "--prefer-lowest"
