@@ -9,7 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.1",
-        "laravel/framework": "^5.5.0 || ^6.0.0 || ^7.0.0",
+        "laravel/framework": "^5.5.0 || ^6.0.0 || ^7.0.0 || ^8.0.0",
         "google/cloud-datastore": "^1.5"
     },
     "autoload": {
@@ -36,7 +36,7 @@
     "require-dev": {
         "mockery/mockery": "^1.1",
         "phpunit/phpunit": "^6.0 || ^7.0 || ^8.0",
-        "orchestra/testbench": "^3.5 || ^4.0 || ^5.0.2",
+        "orchestra/testbench": ">=3.5",
         "guzzlehttp/guzzle": ">=6.3.0",
         "google/cloud-datastore": "^1.5.6"
     }
