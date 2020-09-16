@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   main-test:
     docker:
-    - image: circleci/php:7.2
+    - image: circleci/php:7.4
     - image: google/cloud-sdk:242.0.0
       command: [gcloud, beta, emulators, datastore, start, '--project=laravel-datastore-auth-test', '--host-port=0.0.0.0:8081', '-q', '--consistency=1.0']
     working_directory: ~/repo
@@ -44,6 +44,9 @@ workflows:
           name: "test-php7.3"
           php-version: "7.3"
       - test:
+          name: "test-php7.3"
+          php-version: "7.4"
+      - test:
           name: "test-php7.1-prefer_lowest"
           php-version: "7.1"
           composer_arguments: "--prefer-lowest"
@@ -54,4 +57,8 @@ workflows:
       - test:
           name: "test-php7.3-prefer_lowest"
           php-version: "7.3"
+          composer_arguments: "--prefer-lowest"
+      - test:
+          name: "test-php7.4-prefer_lowest"
+          php-version: "7.4"
           composer_arguments: "--prefer-lowest"
