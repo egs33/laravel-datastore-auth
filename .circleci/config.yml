@@ -44,7 +44,7 @@ workflows:
           name: "test-php7.3"
           php-version: "7.3"
       - test:
-          name: "test-php7.3"
+          name: "test-php7.4"
           php-version: "7.4"
       - test:
           name: "test-php7.1-prefer_lowest"
